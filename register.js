@@ -12,7 +12,7 @@ onAuthStateChanged(auth,(user) => {
     if (user) {
         const uid = user.uid;
         console.log("uid===>",uid)
-        window.location.href = "./profiel.html";
+        // window.location.href = "./profiel.html";
         // console.log('User uid-->', uid)
         // loader_container.style.display = 'none'
         // createAccountContainer.style.display = 'none'
@@ -52,9 +52,9 @@ registerForm.addEventListener('submit',(e) =>{
             uid: user.uid,
         };
         
-        const ecomUserRef = doc(db, "ecom_user", user.uid);
-        console.log("ecomUserRef", ecomUserRef);
-        await setDoc(ecomUserRef, userInfo);
+        const todoRef = doc(db, "todos", user.uid);
+        console.log("todoRef", todoRef);
+        await setDoc(todoRef, userInfo);
         
         // Hide the loader
         loader.classList.add('d-none');
