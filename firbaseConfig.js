@@ -5,7 +5,7 @@
     onAuthStateChanged,createUserWithEmailAndPassword
   } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
   import {
-      getFirestore,doc,setDoc
+      getFirestore,doc,setDoc,collection,addDoc,updateDoc
   } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
   
    // TODO: Add SDKs for Firebase products that you want to use
@@ -28,4 +28,4 @@
  const auth = getAuth(app);
  const db = getFirestore(app);
 
- export {auth,createUserWithEmailAndPassword,db,doc,onAuthStateChanged,setDoc}
+ export {auth,createUserWithEmailAndPassword,db,doc,onAuthStateChanged,setDoc,collection,addDoc,updateDoc}

@@ -1,75 +1,86 @@
 import {
-    db,
-    doc,
-  setDoc,onAuthStateChanged
-  } from "../firbaseConfig.js";
- 
+  auth,
+  db,
+  collection,
+  addDoc,
+  doc,
+  updateDoc,
+} from "../firbaseConfig.js";
 
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      const uid = user.uid;
-      console.log("Current user UID:", uid);
-      } else {
-      console.log("No user signed in");
-    }
-  });
+// ...
 
 // Get references to DOM elements
 const addTodoBtn = document.querySelector("#add-todo");
 const todoFullList = document.querySelector("#todo-full-list");
 const inputValue = document.querySelector("#input-value");
+let addBtn = document.querySelector(".add-btn");
+let editItem;
 
-// Add event listener to addTodoBtn
-addTodoBtn.addEventListener("click", async () => {
-  const todoText = inputValue.value;
+const addTodo = async () => {
+  let todoText = inputValue.value;
 
-  const todoItem = document.createElement("li");
-  todoItem.textContent = todoText;
-
-  const editBtn = document.createElement("button");
+  const todoLiEl = document.createElement("LI");
+  todoLiEl.textContent = todoText;
+  const editBtn = document.createElement("BUTTON");
   editBtn.textContent = "Edit";
-  
-  const deleteBtn = document.createElement("button");
+  const deleteBtn = document.createElement("BUTTON");
   deleteBtn.textContent = "Delete";
-  
-  todoItem.appendChild(editBtn);
-  todoItem.appendChild(deleteBtn);
-  todoFullList.appendChild(todoItem);
 
+  todoLiEl.appendChild(editBtn);
+  todoLiEl.appendChild(deleteBtn);
+  todoFullList.appendChild(todoLiEl);
+
+  editBtn.addEventListener("click", () => editLogic(todoLiEl));
+  
   const todoInfo = { text: todoText };
+
   try {
-    // const uid = user.uid;
-    const todoRef = doc(db, "todos", uid);
-    await setDoc(todoRef, todoInfo);
+    const uid = auth.currentUser.uid;
+    // Add the todo to the "todos" subcollection of the user
+    await addDoc(collection(db, "todos"), todoInfo);
     console.log("Todo added to Firestore:", todoText);
   } catch (error) {
     console.error("Error adding todo:", error);
   }
-});
+  inputValue.value = "";
+};
 
-// Get references to DOM elements
-// const addTodoBtn = document.querySelector("#add-todo");
-// const todoFullList = document.querySelector("#todo-full-list");
+let editLogic = (listItem) => {
+  editItem = listItem;
+  inputValue.value = editItem.textContent;
+  addBtn.innerHTML = "Save";
+  addBtn.removeEventListener("click", addTodo);
+  addBtn.addEventListener("click", saveItem);
+};
 
-// const addTodo = ()=>{
-    
-//     const inputValue = document.querySelector("#input-value").value;
-//         console.log(inputValue);
+let saveItem = async () => {
+  console.log("Editing", editItem);
+  const updatedValue = inputValue.value;
+  editItem.textContent = updatedValue;
 
-//         const todoLiEl = document.createElement("LI");
-//         todoLiEl.textContent = todoText;
-//         const editBtn = document.createElement("EDIT");
-//         editBtn.textContent = "Edit";
-//         const delteBtn = document.createElement("DELETE");
-//         delteBtn.textContent = "Edit";
+  addBtn.innerHTML = "Add";
+  addBtn.removeEventListener("click", saveItem);
+  addBtn.addEventListener("click", addTodo);
 
-//         todoLiEl.appendChild(editBtn);
-//         todoLiEl.appendChild(delteBtn);
-//         todoFullList.appendChild(todoLiEl);
+ 
+  try {
+    const uid = auth.currentUser.uid;
+    console.log(auth.currentUser);
+    const todoRef = doc(db, "todos", uid,wJuBbRukuobLs2fNVYOJ
+    );
 
-//         todoFullList.innerHTML += inputValue
+    // Update the specific field of the document using updateDoc
+    await updateDoc(todoRef, {
+      text: updatedValue,
+    });
 
-// }
+    console.log("Todo updated in Firestore:", updatedValue);
+  } catch (error) {
+    console.error("Error updating todo:", error);
+  }
+  inputValue.value = "";
+  editItem = undefined;
+};
 
-// addTodoBtn.addEventListener('click',addTodo)
+// Add event listener to addTodoBtn
+addTodoBtn.addEventListener("click", addTodo);
